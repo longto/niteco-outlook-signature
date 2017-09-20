@@ -24,7 +24,7 @@
 				padding: 20px;
 				background-color: #efefef;
 			}
-			.ni-button{
+			.ni-button,.ni-button:hover{
 				background-color: #262524;
 				color : #F6BC25;
 			}
@@ -37,28 +37,31 @@
 			textarea {
 			    resize: none;
 			}
-			.suggestion{
+			ul.suggestion{
 				position: absolute;
 				border: 1px solid #ccc;
-				width: calc(100% - 30px);
+				width: calc(100% - 74px);
 				border-radius: 0 0 5px 5px;
 				background-color: #fff;
 				overflow: auto;
 				max-height: 300px;
 				z-index: 1;
-				box-shadow: 1px 1px 3px rgba(0,0,0,0.15);				
+				box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+				padding: 0				
 			}
 			.hide{
 				opacity: 0;
 				pointer-events: none;
 			}
-			.item{
+			ul.suggestion li{
+				list-style: none;
+				margin:0;
 				padding: 10px 20px;
 				border-bottom: 1px solid #eee;
 				cursor: pointer;
 				transition: background-color 0.3s ease;
 			}
-			.item:hover{
+			ul.suggestion li:hover,ul.suggestion li.active{
 				background-color: #efefef;
 			}
 		</style>
@@ -76,8 +79,8 @@
 							<button class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i>&nbsp</button>
 						</span>
 					  </div>
-					  <div class="suggestion hide">
-					  </div>
+					  <ul class="suggestion hide">
+					  </ul>
 					</div>
 
 					<form class="form-horizontal ni-form">
@@ -145,7 +148,7 @@
 						</div>
 
 						<div class="form-group">        
-						  <div class="col-md-offset-3 col-md-8">
+						  <div class="col-md-offset-4 col-md-8">
 						    <button type="button" id="download" class="btn ni-button">Download
 						    	<i class="glyphicon glyphicon-cloud-download"></i>
 						    </button>
@@ -185,12 +188,10 @@
 	<script type="text/javascript">
 		function triggerEvent(el, type){
 		   if ('createEvent' in document) {
-		        // modern browsers, IE9+
 		        var e = document.createEvent('HTMLEvents');
 		        e.initEvent(type, false, true);
 		        el.dispatchEvent(e);
 		    } else {
-		        // IE 8
 		        var e = document.createEventObject();
 		        e.eventType = type;
 		        el.fireEvent('on'+e.eventType, e);
@@ -229,26 +230,40 @@
 			let populateData = function(employees){
 				let search = document.querySelector("#search"),
 					suggestion = document.querySelector(".suggestion");
-				for(var i in employees) {
+				for(let i in employees) {
 					employees[i].index = i;
 				}
 				search.addEventListener("keyup",function(e){
-					var key = e.which || e.keyCode;
-					console.log(key,e);
-					suggestion.focus();
-					//down = 40
-					//e.keyCode = 40
+					let key = e.which || e.keyCode,current,next;
+					switch (key) {
+						case 38 : 
+						case 40 :
+							current = suggestion.querySelector("li.active"),
+							next = key===40 ? current && current.nextElementSibling || suggestion.querySelector("li") : 
+								key===38 ? current && current.previousElementSibling || suggestion.querySelector("li:last-of-type") : "";
+							current ? current.classList.remove("active") : "";
+							next ? next.classList.add("active") : "";
+							next.scrollIntoView();
+							suggestion.classList.remove("hide");
+							break;
+						case 13 : 
+							(suggestion.querySelector("li.active") || suggestion.querySelector("li")).click();
+							
+							break;
+					}
 				});
 				search.addEventListener("input",function(e){
 					let val = e.target.value;
-					if(val.length>=3) {
-						let html = employees.filter(function(obj){							
+					if(val.length>=2) {
+						let html = employees.filter(function(obj){
+							//TODO : search with short name like : Ha Do , split and check all occurents
 							return `${obj.GivenName} ${obj.LastName}`.toLowerCase().indexOf(val.toLowerCase())>-1;
 						}).map(function(obj){
-							return `<div autofocus class="item" data-id="${obj.index}">${obj.Initials||""} ${obj.GivenName} ${obj.LastName}</div> `;
+							return `<li data-id="${obj.index}">${obj.Initials||""} ${obj.GivenName} ${obj.LastName}</li> `;
 						}).join("");
 						suggestion.innerHTML = html;
 						suggestion.classList.remove("hide");
+						suggestion.focus();
 					} else {
 						suggestion.innerHTML="";
 						suggestion.classList.add("hide");
