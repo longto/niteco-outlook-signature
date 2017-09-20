@@ -12,23 +12,32 @@
 				-ms-user-select: none;
 			}
 			.zoom{
-				zoom: 1.5;
-			    -moz-transform:scale(1.5);
+				zoom: 2;
+			    -moz-transform:scale(2);
 			    -moz-transform-origin: 0 0;
-			    -o-transform: scale(1.5);
+			    -o-transform: scale(2);
 			    -o-transform-origin: 0 0;
-			    -webkit-transform: scale(1.5);
+			    -webkit-transform: scale(2);
 			    -webkit-transform-origin: 0 0;
+			}
+			.ni-form{
+				padding: 20px;
+				background-color: #efefef;
+			}
+			.ni-button{
+				background-color: #262524;
+				color : #F6BC25;
 			}
 		</style>
 	</head>
 	<body >
 		<div class="container-fluid">			
 			<center><h3>Niteco singnature -- for Outlook</h3></center>
+
 			<hr>
 			<div class="row">
 				<div class="col-md-6">
-					<form class="form-horizontal">
+					<form class="form-horizontal ni-form">
 						<div class="form-group">
 						  <label class="control-label col-md-3" for="full-name">Full name:</label>
 						  <div class="col-md-9">
@@ -42,6 +51,8 @@
 						    <input type="text" id="job-title" name="job-title" class="form-control" placeholder="Enter job title" autocomplete="off" target="#ni-job-title"/>
 						  </div>
 						</div>
+
+						<hr/>
 
 						<div class="form-group">
 						  <label class="control-label col-md-3" for="mobile">Mobile:</label>
@@ -63,6 +74,15 @@
 						    <input type="text" id="skype" name="skype" class="form-control" placeholder="Enter skype" autocomplete="off" target="#ni-skype"/>
 						  </div>
 						</div>
+
+						<div class="form-group">
+						  <label class="control-label col-md-3" for="website">Website:</label>
+						  <div class="col-md-9">
+						    <input type="text" id="website" name="website" class="form-control" placeholder="Enter website" autocomplete="off" target="#ni-website"/>
+						  </div>
+						</div>
+
+						<hr/>
 
 						<div class="form-group">
 						  <label class="control-label col-md-3" for="company-name">Company name:</label>
@@ -87,7 +107,7 @@
 
 						<div class="form-group">        
 						  <div class="col-md-offset-3 col-md-9">
-						    <button type="button" id="download" class="btn btn-success">Download
+						    <button type="button" id="download" class="btn ni-button">Download
 						    	<i class="glyphicon glyphicon-cloud-download"></i>
 						    </button>
 						  </div>
@@ -95,7 +115,7 @@
 					</form>
 				</div>
 				<div class="col-md-6">
-					<iframe src="outlook-email-signature.htm" width="600px" height="280px" frameBorder="0" class="zoom"></iframe>
+					<iframe src="outlook-email-signature.htm" width="600px" height="280px" frameBorder="0"></iframe>
 				</div>
 			</div>
 			<hr>
