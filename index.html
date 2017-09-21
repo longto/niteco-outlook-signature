@@ -247,7 +247,6 @@
 				let targetId = ele.getAttribute("target");
 				if(!targetId) return;
 				let targetEle = iframeDoc.querySelector(targetId);
-				console.log(targetId,targetEle);
 				ele.value = targetEle.innerHTML;
 				ele.addEventListener("input",function(e){
 					targetEle.innerHTML = e.target.value;
@@ -298,7 +297,6 @@
 				let id = e.target.dataset.id,
 					currentUser = employees[id];
 				suggestion.classList.add("hide");
-				console.log(currentUser);
 				populateUser(currentUser);
 			});
 			searchButton.addEventListener("click",function(e){
@@ -334,7 +332,6 @@
 				let val = search.value;
 				if(val.length>=2) {
 					let valArr = (val.toLowerCase().split(/#|\n|\.|\s+/));
-					console.log(valArr);
 					let html = employees.filter(function(obj){
 						let strArr = `${obj.Initials||""} ${obj.GivenName} ${obj.LastName}`.toLowerCase();
 						return valArr.every(function(eachVal){
@@ -369,7 +366,6 @@
 				if (this.readyState == 4 && this.status == 200) {
 					var decrypted = CryptoJS.AES.decrypt(this.responseText, "Secret Passphrase").toString(CryptoJS.enc.Utf8);	
 					let employees = JSON.parse(decrypted);
-					console.log(employees);
 					populateData(employees);
 				}
 			}
