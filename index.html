@@ -21,8 +21,7 @@
 			    -webkit-transform-origin: 0 0;
 			}
 			.ni-form{
-				padding: 20px;
-				background-color: #efefef;
+				padding-top: 20px;
 			}
 			.ni-button,.ni-button:hover,.ni-button:focus,.ni-button:active{
 				background-color: #262524;
@@ -32,7 +31,7 @@
 	    		margin-bottom: 10px;
 			}
 			.form-horizontal .control-label{
-				padding: 7px 0 0;
+				padding: 7px 7px 0 0;
 			}
 			#search{
 				border: 1px solid #262524;
@@ -43,7 +42,7 @@
 			ul.suggestion{
 				position: absolute;
 				border: 1px solid #ccc;
-				width: calc(100% - 74px);
+				width: calc(100% - 43px);
 				border-radius: 0 0 5px 5px;
 				background-color: #fff;
 				overflow: auto;
@@ -85,6 +84,24 @@
 			  color: #6C6C6C;
 			  font-style: italic;
 			}
+			.no-padding {
+				padding : 0;
+			}
+			.suggestion-container{
+				position : relative;
+			}
+			@media (max-width: 991px){
+				.form-group {
+					margin-bottom: 0;
+				}
+				#download{
+					margin-top: 15px
+				}
+				.form-horizontal .form-group {
+					margin-left: 0;
+					margin-right: 0;
+				}
+			}
 		</style>
 	</head>
 	<body >
@@ -93,83 +110,85 @@
 			<hr>
 			<div class="row">
 				<div class="col-md-6">
-					<div class="form-group ">
-					  <div class="input-group">
-						<input type="text" id="search" autofocus="true" class="form-control" placeholder="Search by name or email ...">
-						<span class="input-group-btn">
-							<button class="btn ni-button" type="button" id="search-button"><i class="glyphicon glyphicon-search"></i>&nbsp</button>
-						</span>
-					  </div>
-					  <ul class="suggestion hide">
-					  </ul>
-					</div>
-
 					<form class="form-horizontal ni-form">
+						<div class="form-group ">
+						  <div class="input-group col-md-offset-3 col-md-9">
+							<input type="text" id="search" autofocus="true" class="form-control" placeholder="Search by name or email ...">
+							<span class="input-group-btn">
+								<button class="btn ni-button" type="button" id="search-button"><i class="glyphicon glyphicon-search"></i>&nbsp</button>
+							</span>
+						  </div>
+						  <div class="suggestion-container col-md-offset-3 col-md-9 no-padding">
+						  	<ul class="suggestion hide">
+						  	</ul>
+						  </div>
+						</div>
+
 						<div class="form-group">
-						  <label class="control-label col-md-4" for="full-name">Full name:</label>
-						  <div class="col-md-8">
+						  <label class="control-label col-md-3" for="full-name">Full name:</label>
+						  <div class="col-md-9 no-padding">
 						    <input type="text" id="full-name" name="full-name" class="form-control" placeholder="Enter full name" autocomplete="off" target="#ni-full-name"/>
 						  </div>
 						</div>
 
 						<div class="form-group">
-						  <label class="control-label col-md-4" for="job-title">Job title:</label>
-						  <div class="col-md-8">
+						  <label class="control-label col-md-3" for="job-title">Job title:</label>
+						  <div class="col-md-9 no-padding">
 						    <input type="text" id="job-title" name="job-title" class="form-control" placeholder="Enter job title" autocomplete="off" target="#ni-job-title"/>
 						  </div>
 						</div>
 
 						<div class="form-group">
-						  <label class="control-label col-md-4" for="mobile">Mobile:</label>
-						  <div class="col-md-8">
+						  <label class="control-label col-md-3" for="mobile">Mobile:</label>
+						  <div class="col-md-9 no-padding">
 						    <input type="tel" id="mobile" name="mobile" class="form-control" placeholder="Enter mobile" autocomplete="off" target="#ni-mobile"/>
 						  </div>
 						</div>
 
 						<div class="form-group">
-						  <label class="control-label col-md-4" for="email">Email:</label>
-						  <div class="col-md-8">
+						  <label class="control-label col-md-3" for="email">Email:</label>
+						  <div class="col-md-9 no-padding">
 						    <input type="email" id="email" name="email" class="form-control" placeholder="Enter email" autocomplete="off" target="#ni-email"/>
 						  </div>
 						</div>
 
 						<div class="form-group">
-						  <label class="control-label col-md-4" for="skype">Skype:</label>
-						  <div class="col-md-8">
+						  <label class="control-label col-md-3" for="skype">Skype:</label>
+						  <div class="col-md-9 no-padding">
 						    <input type="text" id="skype" name="skype" class="form-control" placeholder="Enter skype" autocomplete="off" target="#ni-skype"/>
 						  </div>
 						</div>
 
 						<div class="form-group">
-						  <label class="control-label col-md-4" for="website">Website:</label>
-						  <div class="col-md-8">
+						  <label class="control-label col-md-3" for="website">Website:</label>
+						  <div class="col-md-9 no-padding">
 						    <input type="text" id="website" name="website" class="form-control" placeholder="Enter website" autocomplete="off" target="#ni-website"/>
 						  </div>
 						</div>
 
 						<div class="form-group">
-						  <label class="control-label col-md-4" for="company-name">Company name:</label>
-						  <div class="col-md-8">
+						  <label class="control-label col-md-3" for="company-name">Company name:</label>
+						  <div class="col-md-9 no-padding">
 						    <input type="text" id="company-name" name="company-name" class="form-control" placeholder="Enter company name" autocomplete="off" target="#ni-company-name"/>
 						  </div>
 						</div>
 
 						<div class="form-group">
-						  <label class="control-label col-md-4" for="company-address">Company address:</label>
-						  <div class="col-md-8">
+						  <label class="control-label col-md-3" for="company-address">Company address:</label>
+						  <div class="col-md-9 no-padding">
 						    <textarea type="text" id="company-address" name="company-address" class="form-control" placeholder="Enter company address" autocomplete="off" target="#ni-company-address"></textarea>
 						  </div>
 						</div>
 						
 						<div class="form-group">
-						  <label class="control-label col-md-4" for="company-phone">Company phone:</label>
-						  <div class="col-md-8">
+						  <label class="control-label col-md-3" for="company-phone">Company phone:</label>
+						  <div class="col-md-9 no-padding">
 						    <input type="text" id="company-phone" name="company-phone" class="form-control" placeholder="Enter company phone" autocomplete="off" target="#ni-company-phone"/>
 						  </div>
 						</div>
 
 						<div class="form-group">        
-						  <div class="col-md-offset-4 col-md-8">
+						  <div class="col-md-offset-3 col-md-9 no-padding">
 						    <button type="button" id="download" class="btn ni-button">Download
 						    	<i class="glyphicon glyphicon-cloud-download"></i>
 						    </button>
