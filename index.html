@@ -24,7 +24,7 @@
 				padding: 20px;
 				background-color: #efefef;
 			}
-			.ni-button,.ni-button:hover{
+			.ni-button,.ni-button:hover,.ni-button:focus,.ni-button:active{
 				background-color: #262524;
 				color : #F6BC25;
 			}
@@ -33,6 +33,9 @@
 			}
 			.form-horizontal .control-label{
 				padding: 7px 0 0;
+			}
+			#search{
+				border: 1px solid #262524;
 			}
 			textarea {
 			    resize: none;
@@ -47,7 +50,9 @@
 				max-height: 300px;
 				z-index: 1;
 				box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
-				padding: 0				
+				padding: 0;
+				transition: opacity 0.3s ease;
+				opacity: 1;
 			}
 			.hide{
 				opacity: 0;
@@ -62,7 +67,7 @@
 				transition: background-color 0.3s ease;
 			}
 			ul.suggestion li:hover,ul.suggestion li.active{
-				background-color: #efefef;
+				background-color: #ccc;
 			}
 		</style>
 	</head>
@@ -76,7 +81,7 @@
 					  <div class="input-group">
 						<input type="text" id="search" class="form-control" placeholder="Search for...">
 						<span class="input-group-btn">
-							<button class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i>&nbsp</button>
+							<button class="btn ni-button" type="button" id="search-button"><i class="glyphicon glyphicon-search"></i>&nbsp</button>
 						</span>
 					  </div>
 					  <ul class="suggestion hide">
@@ -163,7 +168,7 @@
 			<hr>
 			<ol style="padding-left: 15px;" >
 				<li>
-					Modify content
+					Search / Modify content
 				</li>
 				<li>
 					Download
@@ -182,11 +187,14 @@
 				<li>
 					After restart, you can select new singature : "niteco-signature"
 				</li>
+				<span class="bg-danger">
+					* For Windows user : %AppData% = C:\Users\[your user name]\AppData\Roaming
+				</span>
 			</ol>
 		</div>
 	</body>
 	<script type="text/javascript">
-		function triggerEvent(el, type){
+		let triggerEvent = function(el, type){
 		   if ('createEvent' in document) {
 		        var e = document.createEvent('HTMLEvents');
 		        e.initEvent(type, false, true);
@@ -197,7 +205,7 @@
 		        el.fireEvent('on'+e.eventType, e);
 		    }
 		}
-		document.querySelector("iframe").addEventListener("load",function(){
+		let bindIframe = function(){
 			let iframeDoc = document.querySelector("iframe").contentDocument;
 			document.querySelectorAll(".form-control").forEach(function(ele,i){
 				let targetId = ele.getAttribute("target");
@@ -209,6 +217,8 @@
 					targetEle.innerHTML = e.target.value;
 				})
 			});
+		}
+		let bindDownload = function(){
 			document.querySelector("#download").addEventListener("click",function(e){
 				e.preventDefault();
 				let fileName = "niteco-signature.htm",
@@ -218,7 +228,9 @@
 				link.setAttribute('download', fileName);
 				link.setAttribute('href', 'data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(data));
 				link.click(); 
-			})
+			});
+		}
+		let connectDb = function(){
 			xhttp = new XMLHttpRequest();			
 			xhttp.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
@@ -227,73 +239,101 @@
 			}
 			xhttp.open("GET", "employees.json", true);
 			xhttp.send();
-			let populateData = function(employees){
-				let search = document.querySelector("#search"),
-					suggestion = document.querySelector(".suggestion");
-				for(let i in employees) {
-					employees[i].index = i;
-				}
-				search.addEventListener("keyup",function(e){
-					let key = e.which || e.keyCode,current,next;
-					switch (key) {
-						case 38 : 
-						case 40 :
-							current = suggestion.querySelector("li.active"),
-							next = key===40 ? current && current.nextElementSibling || suggestion.querySelector("li") : 
-								key===38 ? current && current.previousElementSibling || suggestion.querySelector("li:last-of-type") : "";
-							current ? current.classList.remove("active") : "";
-							next ? next.classList.add("active") : "";
-							next.scrollIntoView();
-							suggestion.classList.remove("hide");
-							break;
-						case 13 : 
-							(suggestion.querySelector("li.active") || suggestion.querySelector("li")).click();
-							
-							break;
-					}
+		}
+		let populateUser = function(obj) {
+			let map = new Map(Object.entries({
+				"#ni-full-name" : `${obj.Initials||""} ${obj.GivenName} ${obj.LastName}`,
+				"#ni-job-title" : `${obj.Position}`,
+				"#ni-mobile" : `${obj.Phone}`,
+				"#ni-email" : `${obj.Email}`,
+				"#ni-skype" : `${obj.Skype}`
+			}));
+			map.forEach(function(value, key, map){
+				let ele = document.querySelector(`[target="${key}"]`);
+				ele.value=value;
+				triggerEvent(ele,"input");
+			})
+		}
+		let bindSearch = function(employees){
+			let search = document.querySelector("#search"),
+				suggestion = document.querySelector(".suggestion")
+				searchButton = document.querySelector("#search-button"),
+				wait = false;//throttle 
+			search.addEventListener("keydown",function(e){
+				if(wait) return;
+				let key = e.which || e.keyCode,current,next;
+				requestAnimationFrame(function(){
+					wait = false;
+					checkKey(key);
 				});
-				search.addEventListener("input",function(e){
-					let val = e.target.value;
-					if(val.length>=2) {
-						let html = employees.filter(function(obj){
-							//TODO : search with short name like : Ha Do , split and check all occurents
-							return `${obj.GivenName} ${obj.LastName}`.toLowerCase().indexOf(val.toLowerCase())>-1;
-						}).map(function(obj){
-							return `<li data-id="${obj.index}">${obj.Initials||""} ${obj.GivenName} ${obj.LastName}</li> `;
-						}).join("");
-						suggestion.innerHTML = html;
+			});
+			suggestion.addEventListener("click",function(e){
+				let id = e.target.dataset.id,
+					currentUser = employees[id];
+				suggestion.classList.add("hide");
+				console.log(currentUser);
+				populateUser(currentUser);
+			});
+			searchButton.addEventListener("click",function(e){
+				applySearch();
+			});
+			let checkKey = function(key){
+				switch (key) {
+					case 38 : 
+					case 40 :
+						current = suggestion.querySelector("li.active"),
+						next = key===40 ? current && current.nextElementSibling || suggestion.querySelector("li") : 
+							key===38 ? current && current.previousElementSibling || suggestion.querySelector("li:last-of-type") : "";
+						current ? current.classList.remove("active") : "";
+						next ? next.classList.add("active") : "";
+						next.scrollIntoView({behavior: "smooth"});
 						suggestion.classList.remove("hide");
-						suggestion.focus();
-					} else {
-						suggestion.innerHTML="";
+						break;
+					case 13 : 
+						(suggestion.querySelector("li.active") || suggestion.querySelector("li")).click();
+						break;
+					case 27 : 
 						suggestion.classList.add("hide");
-					}
-				});				
-				suggestion.addEventListener("click",function(e){
-					let id = e.target.dataset.id,
-						currentUser = employees[id];
-					suggestion.classList.add("hide");
-					console.log(currentUser);
-					populateUser(currentUser);
-				})
-				let populateUser = function(obj) {
-					let map = new Map(Object.entries({
-						"#ni-full-name" : `${obj.Initials||""} ${obj.GivenName} ${obj.LastName}`,
-						"#ni-job-title" : `${obj.Position}`,
-						"#ni-mobile" : `${obj.Phone}`,
-						"#ni-email" : `${obj.Email}`,
-						"#ni-skype" : `${obj.Skype}`
-					}));
-					console.log(map);
-					map.forEach(function(value, key, map){
-						let ele = document.querySelector(`[target="${key}"]`);
-						ele.value=value;
-						triggerEvent(ele,"input");
-					})
+						break;
+					default : 
+						applySearch();
 				}
 			}
-
+			let applySearch = function(){
+				let val = search.value;
+				if(val.length>=2) {
+					let html = employees.filter(function(obj){
+						let str = `${obj.GivenName} ${obj.LastName}`.toLowerCase();
+						return val.toLowerCase().split(" ").every(function(eachVal){
+							return str.indexOf(eachVal)>-1;
+						});
+					}).map(function(obj){
+						return `<li data-id="${obj.index}">${obj.Initials||""} ${obj.GivenName} ${obj.LastName}</li> `;
+					}).join("");
+					if(html){
+						suggestion.innerHTML = html;
+						suggestion.classList.remove("hide");
+						suggestion.querySelector("li").classList.add("active");	
+					}
+					else {
+						suggestion.innerHTML = "<li>No result found</li>";
+					}
+				} else {
+					suggestion.innerHTML="";
+					suggestion.classList.add("hide");
+				}
+			}
+		}
+		let populateData = function(employees){
+			employees.forEach(function(ele,inx){
+				ele.index = inx;		
+			})
+			bindSearch(employees);
+		}
+		document.querySelector("iframe").addEventListener("load",function(){
+			bindIframe();
+			bindDownload();
+			connectDb();
 		});
-		
 	</script>		
 </html>
