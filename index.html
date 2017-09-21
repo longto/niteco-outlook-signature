@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 		<style type="text/css">
 			.unselect{
 				user-drag: none; 
@@ -265,16 +266,6 @@
 				link.click(); 
 			});
 		}
-		let connectDb = function(){
-			xhttp = new XMLHttpRequest();			
-			xhttp.onreadystatechange = function() {
-				if (this.readyState == 4 && this.status == 200) {
-					populateData(JSON.parse(this.responseText));					
-				}
-			}
-			xhttp.open("GET", "employees.json", true);
-			xhttp.send();
-		}
 		let populateUser = function(obj) {
 			let map = new Map(Object.entries({
 				"#ni-full-name" : `${obj.Initials||""} ${obj.GivenName} ${obj.LastName}`,
@@ -371,6 +362,19 @@
 				ele.index = inx;		
 			})
 			bindSearch(employees);
+		}
+		let connectDb = function(){
+			xhttp = new XMLHttpRequest();			
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var decrypted = CryptoJS.AES.decrypt(this.responseText, "Secret Passphrase").toString(CryptoJS.enc.Utf8);	
+					let employees = JSON.parse(decrypted);
+					console.log(employees);
+					populateData(employees);
+				}
+			}
+			xhttp.open("GET", "employees2", true);
+			xhttp.send();
 		}
 		document.querySelector("iframe").addEventListener("load",function(){
 			bindIframe();
